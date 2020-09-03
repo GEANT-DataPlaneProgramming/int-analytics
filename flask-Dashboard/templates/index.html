@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>INT visualisation</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-xs-3">
+            <label> Choose the flow...</label>
+            <select class="form-control" id ='source_id'>
+            </select>
+            <br><br>
+        </div>
+        <div class="col-xs-3">
+            <label for="startdate">Query date (UTC)</label>
+            <input type="datetime-local" id="startdate" name="startdate">
+            <label for="duration">Query period (seconds)</label>
+            <input type="number" id="duration" name="duration" max="60" value=4>
+        </div>
+        <p>
+            <button type="button" class="btn btn-primary updateButton" id="graphsUpdate">Update</button>
+        </p>
+        <label for="graphs">Graphs loading:</label>
+        <progress id="graphs" value="0" max="3"> 100% </progress>
+        <div class="col-md-6">
+            <div class="chart" id="delay">
+                <script>
+                    var graphs = {{delay | safe}};
+                    var layout = {
+                          title: 'Delay',
+                          xaxis: {
+                            title: 'Time',
+                            showgrid: true,
+                            zeroline: false
+                          },
+                          yaxis: {
+                            title: 'Delay (ms)',
+                            showline: false,
+                          }
+                        };
+                    Plotly.plot('delay',graphs,layout);
+                </script>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart" id="delay_hist">
+                <script>
+                    var graphs = {{delay | safe}};
+                    var layout = {
+                          title: 'Delay histogram',
+                          xaxis: {
+                            title: 'Delay (ms)',
+                            showgrid: true,
+                            zeroline: false
+                          },
+                          yaxis: {
+                            title: 'Count',
+                            showline: false,
+                          }
+                        };
+                    Plotly.plot('delay_hist',graphs,layout);
+                </script>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart" id="jitter">
+                <script>
+                    var graphs = {{jitter | safe}};
+                    var layout = {
+                          title: 'Jitter',
+                          xaxis: {
+                            title: 'Time',
+                            showgrid: true,
+                            zeroline: false
+                          },
+                          yaxis: {
+                            title: 'Jitter (ms)',
+                            showline: false,
+                          }
+                        };
+                    Plotly.plot('jitter',graphs,layout);
+                </script>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart" id="jitter_hist">
+                <script>
+                    var graphs = {{jitter | safe}};
+                    var layout = {
+                          title: 'Jitter histogram',
+                          xaxis: {
+                            title: 'Jitter (ms)',
+                            showgrid: true,
+                            zeroline: false
+                          },
+                          yaxis: {
+                            title: 'Count',
+                            showline: false,
+                          }
+                        };
+                    Plotly.plot('jitter_hist',graphs,layout);
+                </script>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart" id="reordering">
+                <script>
+                    var graphs = {{jitter | safe}};
+                    var layout = {
+                          title: 'Packet reordering',
+                          xaxis: {
+                            title: 'Time',
+                            showgrid: true,
+                            zeroline: false
+                          },
+                          yaxis: {
+                            title: 'Reordering factor',
+                            showline: false,
+                          }
+                        };
+                    Plotly.plot('reordering',graphs,layout);
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/jquery-1.11.1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/plots.js') }}"></script>
+</body>
+</html>
