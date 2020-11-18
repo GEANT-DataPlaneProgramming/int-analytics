@@ -1,0 +1,43 @@
+version: "3"
+services:
+  grafana:
+    image: grafana/grafana
+    container_name: grafana_container
+    restart: always
+    ports:
+      - 3003:3000
+    volumes:
+      - grafana-volume:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=root
+      - GF_SECURITY_ADMIN_PASSWORD=Nieno8inT1
+  influxdb:
+    image: influxdb
+    container_name: influxdb_container
+    restart: always
+    ports:
+      - 8086:8086
+      - 8089:8089/udp
+    volumes:
+      - influxdb-volume:/var/lib/influxdb
+    environment:
+      - INFLUXDB_ADMIN_USER=root
+      - INFLUXDB_ADMIN_PASSWORD=gn4intp4
+      - INFLUXDB_USER=int
+      - INFLUXDB_USER_PASSWORD=gn4intp4
+      - INFLUXDB_DB=int_telemetry
+      - INFLUXDB_RETENTION_POLICY=int_policy
+      - INFLUXDB_UDP_0_ENABLED=true
+      - INFLUXDB_UDP_0_DATABASE=int_telemetry
+      #- INFLUXDB_UDP_0_RETENTION_POLICY=int_policy
+      - INFLUXDB_UDP_0_BATCH_TIMEOUT=1s
+      - INFLUXDB_UDP_0_BATCH_SIZE=5000
+      - INFLUXDB_UDP_0_BATCH_PENDING=100
+      - INFLUXDB_UDP_0_BIND_ADDRESS=0.0.0.0:8089
+      - INFLUXDB_UDP_0_READ_BUFFER=8388608 
+       
+volumes:
+  grafana-volume:
+    external: true
+  influxdb-volume:
+    external: true

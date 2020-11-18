@@ -1,0 +1,3 @@
+docker volume create influxdb-volume
+docker volume create grafana-volume
+docker-compose up -d
