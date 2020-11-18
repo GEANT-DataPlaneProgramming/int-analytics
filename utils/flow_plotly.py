@@ -33,7 +33,7 @@ def get_flow_from_influx(flow, duration, starttime=''):
     if starttime == "":
         q = '''SELECT * FROM int_telemetry.flow_monitoring_policy.int_telemetry WHERE "srcip" = '%s' and "dstip" = '%s' and time > now() - %ss''' % (src_ip, dst_ip, duration)
     else:
-        endtime = datetime.strptime(starttime, "%Y-%m-%dT%H:%M:%S.%f") + timedelta(seconds=duration)
+        endtime = datetime.strptime(starttime, "%Y-%m-%dT%H:%M:%S.%f") + timedelta(milliseconds=10*duration) #timedelta(milliseconds=duration)
         q = '''SELECT * FROM int_telemetry.flow_monitoring_policy.int_telemetry WHERE "srcip" = '%s' and "dstip" = '%s' and time > '%s' and time < '%s' ''' % (src_ip, dst_ip, starttime+'Z', endtime.isoformat()+'Z')
     print(q)
     query_resp = influxdb.query(q)
@@ -122,11 +122,14 @@ def create_jitter(int_reports, flow, starttime, duration):
 # https://plotly.com/python/static-image-export/
 #https://plotly.com/python/datashader/
 
-#starttime = "2020-08-25T07:00:00"
-starttime = datetime.utcnow().isoformat()
-flow="150.254.169.196_195.113.172.46"
-duration=200
-int_reports = get_flow_from_influx(flow=flow, duration=duration) #, starttime=starttime)
+
+starttime = "2020-11-13T12:10:00.00"
+#starttime = datetime.utcnow().isoformat()
+#flow="150.254.169.196_195.113.172.46"
+flow="217.77.95.213_195.113.172.46"
+duration=1
+int_reports = get_flow_from_influx(flow=flow, duration=duration, starttime=starttime)
+#int_reports = get_flow_from_influx(flow=flow, duration=duration)
 if len(int_reports) > 0:
     create_delay(int_reports, flow, starttime, duration)
     create_jitter(int_reports, flow, starttime, duration)
