@@ -1,40 +1,27 @@
 # Flow monitoring 
 
-## Step 1 - Run Docker Image with Telegraf (StatsD), InfluxDB and Grafana
+## Step 1 - Run docker-compose with InfluxDB and Grafana
 
 ### Versions
 
-* Docker Image:      2.3.0
-* Ubuntu:            18.04
-* InfluxDB:          1.7.10
-* Telegraf (StatsD): 1.13.3-1
-* Grafana:           6.6.2
+* InfluxDB:          1.8.3
+* Grafana:           7.3.3
 
 ### Quick Start
 
-To start the container the first time launch:
+To start INT monitoring stack for the first time launch create docker volumes manually and then start all defined services:
 
 ```sh
-docker run --ulimit nofile=66000:66000 \
-  -d \
-  --name docker-statsd-influxdb-grafana \
-  -p 3003:3003 \
-  -p 3004:8888 \
-  -p 8086:8086 \
-  -p 8125:8125/udp \
-  samuelebistoletti/docker-statsd-influxdb-grafana:latest
+cd ./in_band_visualisation
+sudo docker volume create influxdb-volume
+sudo docker volume create grafana-volume
+sudo docker-compose up -d
 ```
 
-To stop the container launch:
+To stop the INT monitoring stack launch:
 
 ```sh
-docker stop docker-statsd-influxdb-grafana
-```
-
-To start the container again launch:
-
-```sh
-docker start docker-statsd-influxdb-grafana
+sudo docker-compose stop
 ```
 
 ### Mapped Ports
@@ -42,32 +29,21 @@ docker start docker-statsd-influxdb-grafana
 ```
 Host		Container		Service
 
-3003		3003			grafana
-3004		8888			influxdb-admin (chronograf)
+3003		3000			grafana
 8086		8086			influxdb
-8125		8125			statsd
+8089     8089         influxdb udp
 ```
 
-### InfluxDB
-
-Web Interface
-
-Open <http://localhost:3004>
-
-```
-Username: root
-Password: root
-Port: 8086
-```
-
-### Grafana
+### Grafana User Inteface
 
 Open <http://localhost:3003>
 
 ```
 Username: root
-Password: root
+Password: Nieno8inT1
 ```
+
+## Step 2 - Manually configure Grafana
 
 ### Add data source on Grafana
 
@@ -79,33 +55,21 @@ Password: root
 
 ```
 Url: http://localhost:8086
-Database:	telegraf
-User: telegraf
-Password:	telegraf
+Database:	int_telemetry_db
+User: int
+Password:	Nieno8inT1
 ```
 
 Basic auth and credentials must be left unflagged. Proxy is not required.
 
 Now you are ready to add your first dashboard and launch some query on database.
 
-## Step 2 - Generate traffic flow
+### Import Grafana dashboard
 
-Run the "flow_generator.py" file from the current directory.
-
-Example output:
-
-![Alt text](flow_generator.png?raw=true "Flow Generator")
-
-## Step 3 - Import Grafana dashboard
-
-Open <http://localhost:3004>
+Open <http://localhost:3003>
 
 Select home > import dashboard > Upload .json File.
 
 Select the "Flow Monitoring-1580215648269.json" file from the current directory.
-
-In the upper right corner set the following time period: 2020-01-20 10:23:30 - 2020-01-20 10:24:50.
-
-You should see the final result as shown below.
 
 ![Alt text](flow_monitoring_grafana_dashboard.png?raw=true "Flow monitoring dashboard")
