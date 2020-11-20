@@ -21,9 +21,8 @@ q = '''SELECT * FROM int_telemetry.int_policy.int_telemetry WHERE "srcip" = '%s'
 #q = '''SELECT * FROM int_telemetry.flow_monitoring_policy.int_telemetry WHERE "srcip" = '10.0.10.10' and "dstip" = '10.0.2.2' and time > '2020-09-03T07:18:41.16Z' and time < '2020-09-03T07:18:41.18Z' '''
 #q = '''SELECT * FROM int_telemetry.flow_monitoring_policy.int_telemetry WHERE time > now() - 1s'''
 q = '''SELECT * FROM int_telemetry.int_policy.int_telemetry WHERE "srcip" = '%s' AND "dstip" = '%s' ORDER BY time DESC LIMIT 1000''' % ("217.77.95.213", "195.113.172.46")
-q = '''SELECT delay FROM int_telemetry WHERE "srcip" =~ /'%s'/ AND "dstip" =~ /'%s'/ LIMIT 100000''' % ("217.77.95.213", "195.113.172.46")
-q = '''SELECT * FROM int_telemetry WHERE "srcip" =~ /'%s'/ AND "dstip" =~ /'%s'/ LIMIT 100000''' % ("10.0.0.1", "10.0.0.2")
-q = '''SELECT * FROM int_telemetry_db'''
+q = '''SELECT * FROM int_telemetry WHERE "srcip" = '%s' AND "dstip" = '%s'  LIMIT 100000''' % ("10.0.0.1", "10.0.0.2")
+#q = '''SELECT * FROM int_telemetry'''
 print(q)
 query_resp = client.query(q)
 
