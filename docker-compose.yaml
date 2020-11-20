@@ -37,7 +37,7 @@ services:
       - INFLUXDB_UDP_0_BIND_ADDRESS=0.0.0.0:8089
       - INFLUXDB_UDP_0_READ_BUFFER=8388608 
   plotly:
-    build: ./flask-Dashboard
+    build: ./plotly-dashboard
     container_name: plotly_container
     ports:
       - 5000:5000
