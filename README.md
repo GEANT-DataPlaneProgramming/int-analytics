@@ -1,6 +1,8 @@
-# Flow monitoring 
+# In-band Telemetry flow monitoring analytical platform
 
-## Step 1 - Run docker-compose with InfluxDB and Grafana
+In-band Telemetry flow monitoring analytical platform is composed of the INT database (influxDB) and INT visualisation tooling (Grafana and Plotly-based).
+
+## Step 1 - Run docker-compose with INT analytical platform.
 
 ### Versions
 
@@ -32,9 +34,10 @@ Host    Container   Service
 3003    3000    grafana
 8086    8086    influxdb
 8089    8089    influxdb udp
+5000    5000    plotly
 ```
 
-### Grafana User Inteface
+### Grafana visualisation User Inteface
 
 Open <http://localhost:3003>
 
@@ -42,6 +45,11 @@ Open <http://localhost:3003>
 Username: root
 Password: Nieno8inT1
 ```
+
+### Plotly visualisation User Inteface
+
+Open <http://localhost:5000>
+
 
 ## Step 2 - Manually configure Grafana
 
