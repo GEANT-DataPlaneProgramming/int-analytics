@@ -18,13 +18,13 @@ for i in range(CNT):
 
 
 print(line_body[0])
-message = '\n'.join(line_body) + '\n'
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
-sock.sendto(message, ('localhost', 8089))
+#~ message = '\n'.join(line_body) + '\n'
+#~ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM) # UDP
+#~ sock.sendto(message, ('localhost', 8089))
 
 #  data = ('\n'.join(packet) + '\n').encode('utf-8')
 
-#client.send_packet(line_body, time_precision='u',protocol='line')
+client.send_packet(line_body, time_precision='u',protocol='line')
 
 #~ 1605801680000000i
 #~ 1605801680000001i
