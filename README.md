@@ -9,7 +9,7 @@
 
 ### Quick Start
 
-To start INT monitoring stack for the first time launch create docker volumes manually and then start all defined services:
+To start INT monitoring stack for the first time create docker volumes manually and then start all defined services:
 
 ```sh
 cd ./in_band_visualisation
@@ -27,11 +27,11 @@ sudo docker-compose stop
 ### Mapped Ports
 
 ```
-Host		Container		Service
+Host    Container   Service
 
-3003		3000			grafana
-8086		8086			influxdb
-8089     8089         influxdb udp
+3003    3000    grafana
+8086    8086    influxdb
+8089    8089    influxdb udp
 ```
 
 ### Grafana User Inteface
@@ -54,10 +54,10 @@ Password: Nieno8inT1
 5. Fill remaining fields as follows and click on `Add` without altering other fields
 
 ```
-Url: http://localhost:8086
-Database:	int_telemetry_db
-User: int
-Password:	Nieno8inT1
+Url:    http://localhost:8086
+Database:   int_telemetry_db
+User:   int
+Password:   Nieno8inT1
 ```
 
 Basic auth and credentials must be left unflagged. Proxy is not required.
@@ -70,6 +70,6 @@ Open <http://localhost:3003>
 
 Select home > import dashboard > Upload .json File.
 
-Select the "Flow Monitoring-1580215648269.json" file from the current directory.
+Select newest `json` file from ./grafana directory.
 
 ![Alt text](flow_monitoring_grafana_dashboard.png?raw=true "Flow monitoring dashboard")
