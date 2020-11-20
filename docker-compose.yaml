@@ -25,12 +25,13 @@ services:
       - INFLUXDB_ADMIN_PASSWORD=gn4intp4
       - INFLUXDB_USER=int
       - INFLUXDB_USER_PASSWORD=gn4intp4
-      - INFLUXDB_DB=int_telemetry
-      - INFLUXDB_RETENTION_POLICY=int_policy
+      - INFLUXDB_DB=int_telemetry_db
+      - INFLUXDB_RETENTION_POLICY=int_udp_policy
       - INFLUXDB_UDP_0_ENABLED=true
-      - INFLUXDB_UDP_0_DATABASE=int_telemetry
+      - INFLUXDB_UDP_0_DATABASE=int_telemetry_db
       - INFLUXDB_UDP_0_RETENTION_POLICY=int_udp_policy
       - INFLUXDB_UDP_0_BATCH_TIMEOUT=1s
+      - INFLUXDB_UDP_0_PRECISION=ns
       - INFLUXDB_UDP_0_BATCH_SIZE=5000
       - INFLUXDB_UDP_0_BATCH_PENDING=100
       - INFLUXDB_UDP_0_BIND_ADDRESS=0.0.0.0:8089
