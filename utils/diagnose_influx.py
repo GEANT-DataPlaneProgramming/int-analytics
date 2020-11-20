@@ -1,5 +1,4 @@
 from influxdb import InfluxDBClient
-from influxdb_client import InfluxDBClient, Point
 import time
 import pandas as pd
 import pprint
@@ -9,7 +8,7 @@ port = 8086
 """Instantiate a connection to the InfluxDB."""
 user = 'root'
 password = 'gn4intp4'
-dbname = 'int_telemetry'
+dbname = 'int_telemetry_db'
 
 client = InfluxDBClient(host, port, user, password, dbname)
 client.create_retention_policy('int_udp_policy', '7d', 1, database=None, default=True, shard_duration=u'0s')
