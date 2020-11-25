@@ -35,7 +35,7 @@ services:
       - INFLUXDB_UDP_0_BATCH_SIZE=5000
       - INFLUXDB_UDP_0_BATCH_PENDING=100
       - INFLUXDB_UDP_0_BIND_ADDRESS=0.0.0.0:8089
-      - INFLUXDB_UDP_0_READ_BUFFER=8388608 
+      - INFLUXDB_UDP_0_READ_BUFFER=1073741824      #1G instead of 8388608 
   plotly:
     build: ./plotly-dashboard
     container_name: plotly_container

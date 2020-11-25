@@ -13,14 +13,14 @@ function update_graphs() {
         success: function (data) {
             var graphs = JSON.parse(data);
             var layout = {
-                  title: 'Delay',
+                  title: 'Timestamps difference',
                   xaxis: {
-                    title: 'Time',
+                    title: 'time',
                     showgrid: true,
                     zeroline: false
                   },
                   yaxis: {
-                    title: 'Delay (ms)',
+                    title: 'diff (ms)',
                     showline: false,
                   }
             };
@@ -39,14 +39,14 @@ function update_graphs() {
         success: function (data) {
             var graphs = JSON.parse(data);
             var layout = {
-                  title: 'Delay histogram',
+                  title: 'Timestamps difference histogram',
                   xaxis: {
-                    title: 'Delay (ms)',
+                    title: 'diff (ms)',
                     showgrid: true,
                     zeroline: false
                   },
                   yaxis: {
-                    title: 'Count',
+                    title: 'count',
                     showline: false,
                   }
             };
@@ -65,14 +65,14 @@ function update_graphs() {
         success: function (data) {
             var graphs = JSON.parse(data);
             var layout = {
-                  title: 'Jitter',
+                  title: 'Packet Inter-Arrival Time',
                   xaxis: {
-                    title: 'Time',
+                    title: 'time',
                     showgrid: true,
                     zeroline: false
                   },
                   yaxis: {
-                    title: 'Jitter (ms)',
+                    title: 'IAT (ms)',
                     showline: false,
                   }
             };
@@ -91,14 +91,14 @@ function update_graphs() {
         success: function (data) {
             var graphs = JSON.parse(data);
             var layout = {
-                  title: 'Jitter histogram',
+                  title: 'Packet Inter-Arrival Time histogram',
                   xaxis: {
-                    title: 'Jitter (ms)',
+                    title: 'IAT (ms)',
                     showgrid: true,
                     zeroline: false
                   },
                   yaxis: {
-                    title: 'Count',
+                    title: 'count',
                     showline: false,
                   }
             };
@@ -119,12 +119,12 @@ function update_graphs() {
             var layout = {
                   title: 'Packet reordering',
                   xaxis: {
-                    title: 'Time',
+                    title: 'time',
                     showgrid: true,
                     zeroline: false
                   },
                   yaxis: {
-                    title: 'Reordering factor',
+                    title: 'reordering factor',
                     showline: false,
                   }
             };

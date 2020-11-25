@@ -9,6 +9,21 @@ In-band Telemetry flow monitoring analytical platform is composed of the INT dat
 * InfluxDB:          1.8.3
 * Grafana:           7.3.3
 
+### Preconfiguration
+
+Increase available memory for influxdb UDP buffers:
+
+```
+sudo sysctl -w net.core.rmem_default=1073741824
+sudo sysctl -w net.core.rmem_max=1073741824
+```
+
+Configure the same values permamently in `/etc/sysctl.conf'
+```
+net.core.rmem_max=1073741824
+net.core.rmem_default=1073741824
+```
+
 ### Quick Start
 
 To start INT monitoring stack for the first time create docker volumes manually and then start all defined services:

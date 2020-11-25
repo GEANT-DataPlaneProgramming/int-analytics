@@ -20,27 +20,27 @@ app = Flask(__name__)
 timeseries = {}
 INFLUX_IP = "localhost"
 INFLUX_PORT = 8086
-INFLUX_USERNAME = 'root'
-INFLUX_PASSWD = 'root'
-INFLUX_DATABASE = 'int_telemetry'
+INFLUX_USERNAME = 'int'
+INFLUX_PASSWD = 'xxx'
+INFLUX_DATABASE = 'int_telemetry_db'
 
 def get_srcip_from_influx():
-    return ['10.0.10.10']
-    #~ influxdb = InfluxDBClient(host=INFLUX_IP, port=INFLUX_PORT, username=INFLUX_USERNAME, password=INFLUX_PASSWD, database=INFLUX_DATABASE)
-    #~ query_resp = influxdb.query('''SHOW TAG VALUES FROM int_telemetry.flow_monitoring_policy.int_telemetry WITH KEY = "srcip"''')
-    #~ values = list(query_resp.get_points())
-    #~ values = [v['value'] for v in values] 
-    #~ logger.debug("srcip are %s", str(values))
-    #~ return values[:100]
+    logger.debug('Getting Src IPs from influxDB')
+    influxdb = InfluxDBClient(host=INFLUX_IP, port=INFLUX_PORT, username=INFLUX_USERNAME, password=INFLUX_PASSWD, database=INFLUX_DATABASE)
+    query_resp = influxdb.query('''SHOW TAG VALUES FROM int_telemetry WITH KEY = "srcip"''')
+    values = list(query_resp.get_points())
+    values = [v['value'] for v in values] 
+    logger.debug("srcip are %s", str(values))
+    return values[:100]
     
 def get_dstip_from_influx():
-    return ['10.0.2.2']
-    #~ influxdb = InfluxDBClient(host=INFLUX_IP, port=INFLUX_PORT, username=INFLUX_USERNAME, password=INFLUX_PASSWD, database=INFLUX_DATABASE)
-    #~ query_resp = influxdb.query('''SHOW TAG VALUES FROM int_telemetry.flow_monitoring_policy.int_telemetry WITH KEY = "dstip"''')
-    #~ values = list(query_resp.get_points())
-    #~ values = [v['value'] for v in values] 
-    #~ logger.debug("dstip are %s", str(values))
-    #~ return values[:100]
+    logger.debug('Getting Dst IPs from influxDB')
+    influxdb = InfluxDBClient(host=INFLUX_IP, port=INFLUX_PORT, username=INFLUX_USERNAME, password=INFLUX_PASSWD, database=INFLUX_DATABASE)
+    query_resp = influxdb.query('''SHOW TAG VALUES FROM int_telemetry WITH KEY = "dstip"''')
+    values = list(query_resp.get_points())
+    values = [v['value'] for v in values] 
+    logger.debug("dstip are %s", str(values))
+    return values[:100]
     
 def get_flows_from_influx():
     flows = []
@@ -61,10 +61,10 @@ def get_flow_from_influx(flow, duration, starttime):
         src_ip, dst_ip = flow.split('_')
         influxdb = InfluxDBClient(host=INFLUX_IP, port=INFLUX_PORT, username=INFLUX_USERNAME, password=INFLUX_PASSWD, database=INFLUX_DATABASE)
         if starttime == "":
-            q = '''SELECT * FROM int_telemetry.flow_monitoring_policy.int_telemetry WHERE "srcip" = '%s' and "dstip" = '%s' and time > now() - %ss''' % (src_ip, dst_ip, duration)
+            q = '''SELECT * FROM iint_telemetry WHERE "srcip" = '%s' and "dstip" = '%s' and time > now() - %sms''' % (src_ip, dst_ip, duration)
         else:
-            endtime = datetime.strptime(starttime, "%Y-%m-%dT%H:%M") + timedelta(seconds=duration)
-            q = '''SELECT * FROM int_telemetry.flow_monitoring_policy.int_telemetry WHERE "srcip" = '%s' and "dstip" = '%s' and time > '%s' and time < '%s' ''' % (src_ip, dst_ip, starttime+':00Z', endtime.isoformat()+'Z')
+            endtime = datetime.strptime(starttime, "%Y-%m-%dT%H:%M") + timedelta(milliseconds=int(duration))
+            q = '''SELECT * FROM int_telemetry WHERE "srcip" = '%s' and "dstip" = '%s' and time > '%s' and time < '%s' ''' % (src_ip, dst_ip, starttime+':00Z', endtime.isoformat()+'Z')
         #q = '''SELECT * FROM int_telemetry.flow_monitoring_policy.int_telemetry WHERE "srcip" = '%s' and "dstip" = '%s' ORDER BY time DESC LIMIT 100000''' % (src_ip, dst_ip)
         logger.debug(q)
         query_resp = influxdb.query(q)

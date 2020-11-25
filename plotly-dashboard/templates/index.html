@@ -18,8 +18,8 @@
         <div class="col-xs-3">
             <label for="startdate">Query date (UTC)</label>
             <input type="datetime-local" id="startdate" name="startdate">
-            <label for="duration">Query period (seconds)</label>
-            <input type="number" id="duration" name="duration" max="60" value=4>
+            <label for="duration">Query period (miliseconds)</label>
+            <input type="number" id="duration" name="duration" max="1000" value=100>
         </div>
         <p>
             <button type="button" class="btn btn-primary updateButton" id="graphsUpdate">Update</button>
@@ -31,14 +31,14 @@
                 <script>
                     var graphs = {{delay | safe}};
                     var layout = {
-                          title: 'Delay',
+                          title: 'Timestamps difference',
                           xaxis: {
-                            title: 'Time',
+                            title: 'time',
                             showgrid: true,
                             zeroline: false
                           },
                           yaxis: {
-                            title: 'Delay (ms)',
+                            title: 'diff (ms)',
                             showline: false,
                           }
                         };
@@ -51,14 +51,14 @@
                 <script>
                     var graphs = {{delay | safe}};
                     var layout = {
-                          title: 'Delay histogram',
+                          title: 'Timestamps difference histogram',
                           xaxis: {
-                            title: 'Delay (ms)',
+                            title: 'diff (ms)',
                             showgrid: true,
                             zeroline: false
                           },
                           yaxis: {
-                            title: 'Count',
+                            title: 'count',
                             showline: false,
                           }
                         };
@@ -71,14 +71,14 @@
                 <script>
                     var graphs = {{jitter | safe}};
                     var layout = {
-                          title: 'Jitter',
+                          title: 'Packet Inter-Arrival Time',
                           xaxis: {
-                            title: 'Time',
+                            title: 'time',
                             showgrid: true,
                             zeroline: false
                           },
                           yaxis: {
-                            title: 'Jitter (ms)',
+                            title: 'IAT (ms)',
                             showline: false,
                           }
                         };
@@ -91,14 +91,14 @@
                 <script>
                     var graphs = {{jitter | safe}};
                     var layout = {
-                          title: 'Jitter histogram',
+                          title: 'Packet Inter-Arrival Time histogram',
                           xaxis: {
-                            title: 'Jitter (ms)',
+                            title: 'IAT (ms)',
                             showgrid: true,
                             zeroline: false
                           },
                           yaxis: {
-                            title: 'Count',
+                            title: 'count',
                             showline: false,
                           }
                         };
@@ -113,12 +113,12 @@
                     var layout = {
                           title: 'Packet reordering',
                           xaxis: {
-                            title: 'Time',
+                            title: 'time',
                             showgrid: true,
                             zeroline: false
                           },
                           yaxis: {
-                            title: 'Reordering factor',
+                            title: 'reordering factor',
                             showline: false,
                           }
                         };
