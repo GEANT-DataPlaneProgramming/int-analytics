@@ -101,7 +101,7 @@ def create_jitter(int_reports, flow, starttime, duration):
     )
     fig.update_layout(
         title="Packet Inter-Arrival Time",
-        xaxis_title="Time",
+        xaxis_title="time",
         yaxis_title="IAT (ms)",
         template='plotly_white', #'simple_white'
     )
@@ -126,18 +126,65 @@ def create_jitter(int_reports, flow, starttime, duration):
     filename = "%s_%sms_flow_iat_hist.png" % (starttime.replace(':', '.'), duration)
     pio.write_image(fig, filename, scale=4)
     print("png time is", time.time()-timestamp)
+    
+    
+def create_ipvd(int_reports, flow, starttime, duration):
+    timestamp = time.time()
+    delays = [(r['dstts'] - r['origts'])/MILION for r in int_reports]
+    last_delay = 0
+    ipvd = []
+    for d in delays:
+        ipvd.append(d - last_delay)
+        last_delay = d
+        
+    fig = go.Figure(data = go.Scatter(
+                                                x= get_datatime(int_reports),
+                                                y= np.array(ipvd[1:]),
+                                                mode='markers',
+                                                #marker_color=np.array(delays),
+                                                #marker_colorscale=["blue", "green", "red"], # 'Rainbow',
+                                                marker_size=2)
+    )
+    fig.update_layout(
+        title="Packet Delay Variation (PDV)",
+        xaxis_title="time",
+        yaxis_title="PDV (ms)",
+        template='plotly_white', #'simple_white'
+    )
+    print("scatter time is", time.time()-timestamp)
+    filename = "%s_%sms_flow_pvd.png" % (starttime.replace(':', '.'), duration)
+    pio.write_image(fig, filename, scale=8)
+    print("png time is", time.time()-timestamp)
+    
+    fig = go.Figure(data = go.Histogram( 
+            x = np.array(ipvd[1:]),
+            nbinsx=100)
+    )
+    fig.update_layout(
+        title="Packet Delay Variation histogram",
+        xaxis_title="PDV (ms)",
+        yaxis_title="count",
+        #xaxis_tickformat='.1e',
+        template='plotly_white', #'simple_white'
+    )
+    print("scatter time is", time.time()-timestamp)
+    filename = "%s_%sms_flow_dpv_hist.png" % (starttime.replace(':', '.'), duration)
+    pio.write_image(fig, filename, scale=4)
+    print("png time is", time.time()-timestamp)
+
   
 # https://plotly.com/python/static-image-export/
 #https://plotly.com/python/datashader/
 
 
-starttime = "2020-11-25T8:10:00.00"
+starttime = "2020-11-25T9:00:00.00"
 #starttime = datetime.utcnow().isoformat()
-#flow="150.254.169.196_195.113.172.46"
-flow="217.77.95.213_195.113.172.46"
+flow="150.254.169.196_195.113.172.46"
+#flow="217.77.95.213_195.113.172.46"
 duration=1000    #miliseconds
 int_reports = get_flow_from_influx(flow=flow, duration=duration, starttime=starttime)
 #int_reports = get_flow_from_influx(flow=flow, duration=duration)
 if len(int_reports) > 0:
     create_delay(int_reports, flow, starttime, duration)
     create_jitter(int_reports, flow, starttime, duration)
+    create_ipvd(int_reports, flow, starttime, duration)
