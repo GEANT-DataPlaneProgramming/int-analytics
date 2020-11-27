@@ -34,7 +34,7 @@ def get_flow_from_influx(flow, duration, starttime=''):
     if starttime == "":
         q = '''SELECT * FROM int_telemetry WHERE "srcip" = '%s' and "dstip" = '%s' and time > now() - %sms''' % (src_ip, dst_ip, duration)
     else:
-        endtime = datetime.strptime(starttime, "%Y-%m-%dT%H:%M:%S.%f") + timedelta(milliseconds=duration)
+        endtime = datetime.strptime(starttime, "%Y-%m-%dT%H:%M:%S.%f") + timedelta(milliseconds=duration) #milliseconds
         q = '''SELECT * FROM int_telemetry WHERE "srcip" = '%s' and "dstip" = '%s' and time > '%s' and time < '%s' ''' % (src_ip, dst_ip, starttime+'Z', endtime.isoformat()+'Z')
     print(q)
     query_resp = influxdb.query(q)
@@ -48,6 +48,10 @@ MILION = 1000000.0
 def create_delay(int_reports, flow, starttime, duration):
     timestamp = time.time()
     delays = [(r['dstts'] - r['origts'])/MILION for r in int_reports]
+    min_delay = min(delays)
+    max_dalay = max(delays)
+    shift = 10 #(max_dalay - min_delay)/10.0
+    delays = [d - min_delay + shift for d in delays]
     fig = go.Figure(data = go.Scatter(
                                                 x= get_datatime(int_reports),
                                                 y= np.array(delays),
@@ -60,7 +64,7 @@ def create_delay(int_reports, flow, starttime, duration):
         title="Timestamps difference",
         xaxis_title="time",
         yaxis_title="diff (ms)",
-        yaxis_tickformat='.1e',
+        #yaxis_tickformat='.1e',
         template='plotly_white', #'simple_white'
     )
     print("scatter time is", time.time()-timestamp)
@@ -76,7 +80,7 @@ def create_delay(int_reports, flow, starttime, duration):
         title="Timestamps difference histogram",
         xaxis_title="diff (ms)",
         yaxis_title="count",
-        xaxis_tickformat='.1e',
+        #xaxis_tickformat='.1e',
         template='plotly_white', #'simple_white'
     )
     print("scatter time is", time.time()-timestamp)
@@ -177,14 +181,15 @@ def create_ipvd(int_reports, flow, starttime, duration):
 #https://plotly.com/python/datashader/
 
 
-starttime = "2020-11-25T9:00:00.00"
-#starttime = datetime.utcnow().isoformat()
-flow="150.254.169.196_195.113.172.46"
-#flow="217.77.95.213_195.113.172.46"
-duration=1000    #miliseconds
-int_reports = get_flow_from_influx(flow=flow, duration=duration, starttime=starttime)
-#int_reports = get_flow_from_influx(flow=flow, duration=duration)
-if len(int_reports) > 0:
-    create_delay(int_reports, flow, starttime, duration)
-    create_jitter(int_reports, flow, starttime, duration)
-    create_ipvd(int_reports, flow, starttime, duration)
+for duration in [10, 100]:
+    starttime = "2020-11-25T17:30:00.10"
+    #starttime = datetime.utcnow().isoformat()
+    #flow="150.254.169.196_195.113.172.46"
+    flow="217.77.95.213_195.113.172.46"
+    #duration=1000    #miliseconds
+    int_reports = get_flow_from_influx(flow=flow, duration=duration, starttime=starttime)
+    #int_reports = get_flow_from_influx(flow=flow, duration=duration)
+    if len(int_reports) > 0:
+        create_delay(int_reports, flow, starttime, duration)
+        create_jitter(int_reports, flow, starttime, duration)
+        create_ipvd(int_reports, flow, starttime, duration)
