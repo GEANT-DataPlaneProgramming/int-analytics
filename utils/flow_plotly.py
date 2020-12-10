@@ -6,6 +6,8 @@ from pprint import pprint
 import plotly.graph_objs as go
 import plotly.io as pio
 from datetime import datetime, timedelta
+import pandas as pd 
+import os
 
 host = 'hs-04.ipa.psnc.pl'
 port = 8086
@@ -15,7 +17,11 @@ dbname = 'int_telemetry_db'
 dbuser = 'int'
 dbuser_password = 'my_secret_password'
 
+pio.kaleido.scope.default_width = 1000
+pio.kaleido.scope.default_height = 0.6 * pio.kaleido.scope.default_width
+
 client = InfluxDBClient(host, port, user, password, dbname)
+
 
 def get_datatime(int_reports):
     if len(int_reports) == 0:
@@ -34,7 +40,7 @@ def get_flow_from_influx(flow, duration, starttime=''):
     if starttime == "":
         q = '''SELECT * FROM int_telemetry WHERE "srcip" = '%s' and "dstip" = '%s' and time > now() - %sms''' % (src_ip, dst_ip, duration)
     else:
-        endtime = datetime.strptime(starttime, "%Y-%m-%dT%H:%M:%S.%f") + timedelta(milliseconds=duration) #milliseconds
+        endtime = datetime.strptime(starttime, "%Y-%m-%dT%H:%M:%S.%f") + timedelta(milliseconds=duration)
         q = '''SELECT * FROM int_telemetry WHERE "srcip" = '%s' and "dstip" = '%s' and time > '%s' and time < '%s' ''' % (src_ip, dst_ip, starttime+'Z', endtime.isoformat()+'Z')
     print(q)
     query_resp = influxdb.query(q)
@@ -43,6 +49,27 @@ def get_flow_from_influx(flow, duration, starttime=''):
     print("query time is", time.time()-timestamp)
     print("Numer of points queries", len(int_reports))
     return int_reports
+    
+def get_flow_rate_from_influx(flow, duration, starttime=''):
+    if flow is None:
+        return []
+    timestamp = time.time()
+    src_ip, dst_ip = flow.split('_')
+    influxdb = InfluxDBClient(host=host, port=port, username=user, password=password, database=dbname)
+    if starttime == "":
+        q = ''' SELECT count("dstts") FROM int_telemetry WHERE "srcip" = '%s' and "dstip" = '%s' AND  time > now() - %sms GROUP BY time(1ms)  ''' % (src_ip, dst_ip, duration)
+    else:
+        endtime = datetime.strptime(starttime, "%Y-%m-%dT%H:%M:%S.%f") + timedelta(milliseconds=duration)
+        q = ''' SELECT count("dstts") FROM int_telemetry WHERE "srcip" = '%s' and "dstip" = '%s' AND  time > '%s' and time < '%s' GROUP BY time(1ms)  ''' % (src_ip, dst_ip, starttime+'Z', endtime.isoformat()+'Z')
+    print(q)
+    query_resp = influxdb.query(q)
+    int_reports = list(query_resp.get_points())
+    pprint(int_reports[0])
+    print("query time is", time.time()-timestamp)
+    print("Numer of points queries", len(int_reports))
+    return int_reports
+
+
 
 MILION = 1000000.0
 def create_delay(int_reports, flow, starttime, duration):
@@ -69,7 +96,7 @@ def create_delay(int_reports, flow, starttime, duration):
     )
     print("scatter time is", time.time()-timestamp)
     filename = "%s_%sms_flow_delay.png" % (starttime.replace(':', '.'), duration)
-    pio.write_image(fig, filename, scale=8)
+    pio.write_image(fig, filename, scale=4)
     print("png time is", time.time()-timestamp)
     
     fig = go.Figure(data = go.Histogram( 
@@ -85,8 +112,11 @@ def create_delay(int_reports, flow, starttime, duration):
     )
     print("scatter time is", time.time()-timestamp)
     filename = "%s_%sms_flow_delay_hist.png" % (starttime.replace(':', '.'), duration)
-    pio.write_image(fig, filename, scale=4)
+    pio.write_image(fig, filename, scale=1)
     print("png time is", time.time()-timestamp)
+
+
+
 
 def create_jitter(int_reports, flow, starttime, duration):
     timestamp = time.time()
@@ -111,7 +141,7 @@ def create_jitter(int_reports, flow, starttime, duration):
     )
     print("scatter time is", time.time()-timestamp)
     filename = "%s_%sms_flow_iat.png" % (starttime.replace(':', '.'), duration)
-    pio.write_image(fig, filename, scale=8)
+    pio.write_image(fig, filename, scale=4)
     print("png time is", time.time()-timestamp)
     
     
@@ -128,8 +158,10 @@ def create_jitter(int_reports, flow, starttime, duration):
     )
     print("scatter time is", time.time()-timestamp)
     filename = "%s_%sms_flow_iat_hist.png" % (starttime.replace(':', '.'), duration)
-    pio.write_image(fig, filename, scale=4)
+    pio.write_image(fig, filename, scale=1)
     print("png time is", time.time()-timestamp)
+    
+    
     
     
 def create_ipvd(int_reports, flow, starttime, duration):
@@ -157,7 +189,7 @@ def create_ipvd(int_reports, flow, starttime, duration):
     )
     print("scatter time is", time.time()-timestamp)
     filename = "%s_%sms_flow_pvd.png" % (starttime.replace(':', '.'), duration)
-    pio.write_image(fig, filename, scale=8)
+    pio.write_image(fig, filename, scale=2)
     print("png time is", time.time()-timestamp)
     
     fig = go.Figure(data = go.Histogram( 
@@ -173,23 +205,60 @@ def create_ipvd(int_reports, flow, starttime, duration):
     )
     print("scatter time is", time.time()-timestamp)
     filename = "%s_%sms_flow_dpv_hist.png" % (starttime.replace(':', '.'), duration)
-    pio.write_image(fig, filename, scale=4)
+    pio.write_image(fig, filename, scale=1)
     print("png time is", time.time()-timestamp)
+    
+ 
+def create_packet_rate(flow, duration, starttime):
+    int_reports = get_flow_rate_from_influx(flow, duration, starttime)
+    timestamps = [r['time'] for r in int_reports]
+    rates = [r['count'] for r in int_reports]
+    timestamp = time.time()
+   
+    fig = go.Figure(data = go.Scatter(
+                                                x= timestamps,
+                                                y= np.array(rates),
+                                                mode='markers',
+                                                marker_size=2)
+    )
+    fig.update_layout(
+        title="Packet rate",
+        xaxis_title="time",
+        yaxis_title="Pkt/ms",
+        template='plotly_white'
+    )
+    print("scatter time is", time.time()-timestamp)
+    filename = "%s_%sms_flow_rate.png" % (starttime.replace(':', '.'), duration)
+    pio.write_image(fig, filename, scale=1)
+    print("png time is", time.time()-timestamp)
+        
+    save(flow+"_rate",  starttime, duration, int_reports)
+
+    
+def save(flow, starttime, duration, int_reports):
+    filename = "flow_%s_%s_%sms.csv" % (flow, starttime.replace(':', '.'), duration)
+    df = pd.DataFrame(int_reports) 
+    df.to_csv(filename, index=False)
+    os.system("zip %s %s" % (filename.replace('csv', 'zip'), filename))
+    os.system("rm %s" % filename)
 
   
 # https://plotly.com/python/static-image-export/
 #https://plotly.com/python/datashader/
 
 
-for duration in [10, 100]:
-    starttime = "2020-11-25T17:30:00.10"
+for duration in [1000*60]:
+    starttime = "2020-12-08T17:30:00.00"
     #starttime = datetime.utcnow().isoformat()
     #flow="150.254.169.196_195.113.172.46"
     flow="217.77.95.213_195.113.172.46"
     #duration=1000    #miliseconds
-    int_reports = get_flow_from_influx(flow=flow, duration=duration, starttime=starttime)
+    #int_reports = get_flow_from_influx(flow=flow, duration=duration, starttime=starttime)
     #int_reports = get_flow_from_influx(flow=flow, duration=duration)
-    if len(int_reports) > 0:
-        create_delay(int_reports, flow, starttime, duration)
-        create_jitter(int_reports, flow, starttime, duration)
-        create_ipvd(int_reports, flow, starttime, duration)
+    create_packet_rate(flow, duration, starttime)
+    #if len(int_reports) > 0:
+        #save(flow, starttime, duration, int_reports)
+        #~ create_delay(int_reports, flow, starttime, duration)
+        #~ create_jitter(int_reports, flow, starttime, duration)
+        #~ create_ipvd(int_reports, flow, starttime, duration)
+

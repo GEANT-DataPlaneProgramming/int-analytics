@@ -1,10 +1,11 @@
 from influxdb import InfluxDBClient
 import time
 import pandas as pd
-import pprint
+from pprint import pprint
 import pickle
-from datetime import datetime
 import pandas as pd 
+from datetime import datetime, timedelta
+import os
 
 host = 'hs-04.ipa.psnc.pl'
 port = 8086
@@ -15,10 +16,6 @@ dbname = 'int_telemetry_db'
 dbuser_password = 'my_secret_password'
 
 client = InfluxDBClient(host, port, user, password, dbname)
-
-#srcip = '150.254.169.196'
-srcip = '217.77.95.213'
-dstip = '195.113.172.46'
 
 
 def check_missing_entries(samples):
@@ -36,32 +33,54 @@ def check_missing_entries(samples):
 
     print('Sum of missing seq is {0} ({1:.3f}%)'.format(sum_missing, 100.0*sum_missing/len(samples)))
 
-starttime = datetime.utcnow().isoformat()
-print(starttime)
-duration = '3m'
 
-q = '''SELECT * FROM int_telemetry WHERE "srcip" = '%s' AND "dstip" = '%s' ORDER BY time DESC LIMIT 100000''' % (srcip, dstip)
-q = '''SELECT * FROM int_telemetry WHERE "srcip" = '%s' and "dstip" = '%s' and time > '2020-09-03T07:18:41.16Z' and time < '2020-09-03T07:18:41.18Z' ''' % (srcip, dstip)
-q = '''SELECT seq FROM int_telemetry WHERE "srcip" = '%s' and "dstip" = '%s' and time > now() - %s''' % (srcip, dstip, duration)
-#q = '''SELECT * FROM int_telemetry WHERE "srcip" = '%s' and "dstip" = '%s' ''' % (srcip, dstip)
-query_resp = client.query(q)
+def get_flow_from_influx(flow, duration, starttime=''):
+    if flow is None:
+        return []
+    timestamp = time.time()
+    src_ip, dst_ip = flow.split('_')
+    influxdb = InfluxDBClient(host=host, port=port, username=user, password=password, database=dbname)
+    if starttime == "":
+        q = '''SELECT * FROM int_telemetry WHERE "srcip" = '%s' and "dstip" = '%s' and time > now() - %ss''' % (src_ip, dst_ip, duration)
+    else:
+        endtime = datetime.strptime(starttime, "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=duration)
+        q = '''SELECT * FROM int_telemetry WHERE "srcip" = '%s' and "dstip" = '%s' and time > '%s' and time < '%s' ''' % (src_ip, dst_ip, starttime+'Z', endtime.isoformat()+'Z')
+    print(q)
+    query_resp = influxdb.query(q)
+    int_reports = list(query_resp.get_points())
+    pprint(int_reports[0])
+    print("query time is", time.time()-timestamp)
+    print("Numer of points queries", len(int_reports))
+    return int_reports
+    
+    
+def save(flow, starttime, duration, int_reports):
+    filename = "flow_%s_%s_%ssec.csv" % (flow, starttime.replace(':', '.'), duration)
+    df = pd.DataFrame(int_reports) 
+    df.to_csv(filename, index=False)
+    os.system("zip %s %s" % (filename.replace('csv', 'zip'), filename))
+    os.system("rm %s" % filename)
+    
+    
+    
+starttime = "2020-12-08T17:20:00"
+#starttime = datetime.utcnow().isoformat()
+#flow="150.254.169.196_195.113.172.46"
+flow="217.77.95.213_195.113.172.46"
+duration=60*10 #seconds
+step = 1 #second
 
-samples = list(query_resp.get_points())
-print(len(samples))
-print(samples[0])
-
-check_missing_entries(samples)
-
-
-filename = "flow_%s_%s_%s_%s.csv" % (srcip, dstip, starttime.replace(':', '.'), duration)
-
-df = pd.DataFrame(samples) 
-
-#print(df)
-df.to_csv(filename, index=False)
-
-#with open(filename, 'wb') as f:
-#    pickle.dump(samples, f)
+_starttime = starttime
+while duration > 0:
+    int_reports = get_flow_from_influx(flow, step, _starttime)
+    save(flow, _starttime, duration, int_reports)
+    _starttime = datetime.strptime(_starttime, "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=step)
+    _starttime = _starttime.isoformat()
+    duration -= step
+    
+    
+    
+    
 
 
 
