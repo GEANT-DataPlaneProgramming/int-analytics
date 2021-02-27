@@ -78,6 +78,7 @@ Open <http://localhost:5000>
 ```
 Url:    http://localhost:8086
 Database:   int_telemetry_db
+```
 
 Basic auth and credentials must be left unflagged. Proxy is not required.
 
