@@ -2,6 +2,9 @@
 
 In-band Telemetry flow monitoring analytical platform is composed of the INT database (influxDB) and INT visualisation tooling (Grafana and Plotly-based).
 
+The INT implementation and testing was done within the GÉANT Data Plane Programmibilty activity:
+* website will be published soon
+
 ## Step 1 - Run docker-compose with INT analytical platform.
 
 ### Versions
@@ -56,10 +59,6 @@ Host    Container   Service
 
 Open <http://localhost:3003>
 
-```
-Username: root
-Password: Nieno8inT1
-```
 
 ### Plotly visualisation User Inteface
 
@@ -79,9 +78,6 @@ Open <http://localhost:5000>
 ```
 Url:    http://localhost:8086
 Database:   int_telemetry_db
-User:   int
-Password:   Nieno8inT1
-```
 
 Basic auth and credentials must be left unflagged. Proxy is not required.
 
@@ -96,3 +92,7 @@ Select home > import dashboard > Upload .json File.
 Select newest `json` file from ./grafana directory.
 
 ![Alt text](flow_monitoring_grafana_dashboard.png?raw=true "Flow monitoring dashboard")
+
+## Contact
+
+int-discuss@lists.geant.org
