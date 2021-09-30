@@ -3,7 +3,7 @@
 In-band Telemetry flow monitoring analytical platform is composed of the INT database (influxDB) and INT visualisation tooling (Grafana and Plotly-based).
 
 The INT implementation and testing was done within the GÉANT Data Plane Programmibilty activity:
-* website will be published soon
+* https://wiki.geant.org/display/NETDEV/DPP
 
 ## Step 1 - Run docker-compose with INT analytical platform.
 
