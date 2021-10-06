@@ -27,6 +27,17 @@ net.core.rmem_max=1073741824
 net.core.rmem_default=1073741824
 ```
 
+Rename the file .env-example to .env. __Then, change example values to valid passwords and usernames in .env file.__
+
+```
+GF_SECURITY_ADMIN_USER = example_grafana_admin_user
+GF_SECURITY_ADMIN_PASSWORD = example_grafana_admin_password
+INFLUXDB_ADMIN_USER = example_influx_admin_user
+INFLUXDB_ADMIN_PASSWORD = example_influx_admin_password
+INFLUXDB_USER = example_influx_user
+INFLUXDB_USER_PASSWORD = example_influx_user_password
+```
+
 ### Quick Start
 
 To start INT monitoring stack for the first time create docker volumes manually and then start all defined services:
