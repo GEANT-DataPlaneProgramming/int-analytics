@@ -87,7 +87,7 @@ Open <http://localhost:5000>
 5. Fill remaining fields as follows and click on `Add` without altering other fields
 
 ```
-Url:    http://localhost:8086
+Url:    http://influxdb:8086
 Database:   int_telemetry_db
 ```
 
