@@ -90,6 +90,7 @@ Open <http://localhost:5000>
 Url:    http://influxdb:8086
 Database:   int_telemetry_db
 ```
+6. Use value of INFLUXDB_ADMIN_USER as a user and INFLUXDB_ADMIN_PASSWORD as password (please check Influx configuration in .env file)
 
 Basic auth and credentials must be left unflagged. Proxy is not required.
 
